@@ -1,0 +1,203 @@
+---
+title: "DS785 Analysis"
+author: "Lyle Paukner"
+date: "4/23/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(ggthemes)
+library(dplyr)
+library(ggrepel)
+library(shadowtext)
+```
+
+## NFL Scatterplots
+```{r}
+#load datatset
+nfl_conversions = read.csv("~/DS 785/Python/Data/NFL_Conversions_Results_1999to2021.csv")
+nfl_stats = read.csv("~/DS 785/Python/Data/NFL_Stat_Rank_Results_1997to2021.csv")
+
+#create pass% column
+nfl_stats['pass_pct'] = nfl_stats['Passing_Att']/(nfl_stats['Passing_Att']+nfl_stats['Rushing_Att'])
+nfl_stats['pass_rush_ratio'] = nfl_stats['Passing_Att']/nfl_stats['Rushing_Att']
+
+# merge and filter datasets
+nfl_combined <- merge(nfl_conversions,nfl_stats,by=c("Key","Unnamed..0_level_0_Player"))
+nfl_combined = filter(nfl_combined, Unnamed..0_level_0_Player == "Team Stats")
+nfl_stats_filtered = filter(nfl_stats, Unnamed..0_level_0_Player == "Team Stats")
+
+# Add scoring rank
+nfl_stats_filtered = nfl_stats_filtered %>%
+                      group_by(Year) %>%
+                      mutate(scoring_ranks = order(order(Unnamed..1_level_0_PF, decreasing=TRUE)))
+
+```
+
+```{r}
+
+#plot score on pass%
+#fit trendline
+p = ggplot(nfl_stats_filtered, aes(x=pass_pct, y=Unnamed..1_level_0_PF)) + 
+      geom_point(shape=18, color="dodgerblue4") +
+      geom_smooth(method=lm,  linetype="dashed",
+              color="darkred", fill="blue") + 
+      ggtitle("Teams' Passing and Scoring: NFL (1997-2021)") + 
+      ylab("Points Scored in Season") + 
+      xlab("Passes as Percent of Offensive Plays")
+
+nfl_lm_eqn <- function(df){
+    m <- lm(Unnamed..1_level_0_PF ~ pass_pct, df);
+    eq <- substitute(italic(Pts) == a + b %.% italic('P_Pct')*","~~italic(R)^2~"="~r2, 
+         list(a = format(unname(coef(m)[1]), digits = 2),
+              b = format(unname(coef(m)[2]), digits = 2),
+             r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq));
+}
+
+p1 <- p + geom_text(x = 0.425, y = 180, label = nfl_lm_eqn(nfl_stats_filtered), parse = TRUE)
+
+p1
+```
+```{r}
+
+# Plot Scoring Ranks on Passing
+
+p = ggplot(nfl_stats_filtered, aes(x=pass_pct, y=scoring_ranks)) + 
+      geom_point(shape=18, color="dodgerblue4") +
+      geom_smooth(method=lm,  linetype="dashed",
+              color="darkred", fill="blue") + 
+      ggtitle("Teams' Passing and Scoring Ranks: NFL (1997-2021)") + 
+      ylab("Scoring Rank (Lower is Better)") + 
+      xlab("Passes as Percent of Offensive Plays")
+
+nfl_score_lm_eqn <- function(df){
+    m <- lm(scoring_ranks ~ pass_pct, df);
+    eq <- substitute(~~italic(R)^2~"="~r2, 
+         list(r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq));
+}
+
+p1 <- p + geom_text(x = 0.4, y = 5, label = nfl_score_lm_eqn(nfl_stats_filtered), parse = TRUE)
+
+p1
+
+```
+
+
+
+## NBA Scatterplots
+```{r}
+#load datatset
+nba_per_game = read.csv("~/DS 785/Python/NBA_Team_Per_Game_1997to2021.csv")
+nba_per_game['ThreePt_shot_pct'] = nba_per_game['X3PA']/nba_per_game['FGA']
+
+```
+
+```{r}
+#fit score on 3pa
+#fit trendline
+p2 = ggplot(nba_per_game, aes(x=ThreePt_shot_pct, y=PTS)) + 
+      geom_point(shape=18, color="dodgerblue4") +
+      geom_smooth(method=lm,  linetype="dashed",
+              color="darkred", fill="blue") + 
+      ggtitle("Teams' 3-point Attempts and Scoring in the NBA (1997-2021)") + 
+      ylab("Points per Game") + 
+      xlab("3-point Shots as Percent of Shots Taken")
+
+nba_lm_eqn <- function(df){
+    m <- lm(PTS ~ ThreePt_shot_pct, df);
+    eq <- substitute(italic(Pts) == a + b %.% italic('Thr_Pct')*","~~italic(R)^2~"="~r2, 
+         list(a = format(unname(coef(m)[1]), digits = 2),
+              b = format(unname(coef(m)[2]), digits = 2),
+             r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq));
+}
+
+p3 <- p2 + geom_text(x = 0.435, y = 90, label = nba_lm_eqn(nba_per_game), parse = TRUE)
+
+p3
+
+```
+
+## MLB Scatterplots
+```{r}
+#load datatset
+mlb_pitching = read.csv("~/DS 785/Python/MLB_Pitching_Results_1980to2021.csv")
+mlb_batting = read.csv("~/DS 785/Python/MLB_Batting_Results_1980to2021.csv")
+
+# Filter out irrelevant rows and add season rankings for ERA
+mlb_pitching = mlb_pitching[!(!is.na(mlb_pitching$Tm) & mlb_pitching$Tm=="") & mlb_pitching$Tm!="League Average", ]
+
+mlb_pitching = mlb_pitching %>%
+                group_by(Year) %>%
+                mutate(era_ranks = order(order(ERA, decreasing=FALSE)))
+
+# Filter out irrelevant rows and add season rankings for Runs per Game
+mlb_batting = mlb_batting[!(!is.na(mlb_batting$Tm) & mlb_batting$Tm=="") & mlb_batting$Tm!="League Average", ]
+
+mlb_batting = mlb_batting %>%
+                group_by(Year) %>%
+                mutate(run_ranks = order(order(R.G, decreasing=TRUE)))
+
+```
+
+```{r}
+# Plot ERA rankings against # pitchers used
+
+p4 = ggplot(mlb_pitching, aes(x=X.P, y=era_ranks)) + 
+      geom_point(shape=18, color="dodgerblue4") +
+      geom_smooth(method=lm,  linetype="dashed",
+              color="darkred", fill="blue") + 
+      ggtitle("Number of Pitchers Used in Season and ERA") + 
+      ylab("ERA Rank (Lower is Better)") + 
+      xlab("Total Pitchers Used in Season")
+
+mlb_era_lm_eqn <- function(df){
+    m <- lm(era_ranks ~ X.P, df);
+    eq <- substitute(~~italic(R)^2~"="~r2, 
+         list(r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq));
+}
+
+p5 <- p4 + geom_text(x = 37.5, y = 5, label = mlb_era_lm_eqn(mlb_pitching), parse = TRUE)
+
+p5
+
+
+
+```
+
+```{r}
+# Plot Scoring rankings against # pitchers used
+
+p6 = ggplot(mlb_batting, aes(x=X.Bat, y=run_ranks)) + 
+      geom_point(shape=18, color="dodgerblue4") +
+      geom_smooth(method=lm,  linetype="dashed",
+              color="darkred", fill="blue") + 
+      ggtitle("Number of Batters Used in Season and Runs") + 
+      ylab("Runs Rank (Lower is Better)") + 
+      xlab("Total Batters Used in Season")
+
+mlb_run_lm_eqn <- function(df){
+    m <- lm(run_ranks ~ X.Bat, df);
+    eq <- substitute(~~italic(R)^2~"="~r2, 
+         list(r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq));
+}
+
+p7 <- p6 + geom_text(x = 65, y = 5, label = mlb_run_lm_eqn(mlb_batting), parse = TRUE)
+
+p7
+
+
+
+```
+
+
+
+
+
+
