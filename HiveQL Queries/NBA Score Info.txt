@@ -1,0 +1,21 @@
+SELECT 	
+	year,
+	
+	--Total Score
+	ROUND(SUM((home_pts + vis_pts))/COUNT(gamedate), 3) AS TotalScoreAvg,
+	PERCENTILE(CAST((home_pts + vis_pts) as BIGINT), 0.25) AS TotalScore25,
+	PERCENTILE(CAST((home_pts + vis_pts) as BIGINT), 0.5) AS TotalScore50,
+	PERCENTILE(CAST((home_pts + vis_pts) as BIGINT), 0.75) AS TotalScore75,
+
+	--Score Differential
+	ROUND(SUM(ABS(home_pts - vis_pts))/COUNT(gamedate), 3) AS ScoreDiffAvg,
+	PERCENTILE(CAST(ABS(home_pts - vis_pts) as BIGINT), 0.25) AS ScoreDiff25,
+	PERCENTILE(CAST(ABS(home_pts - vis_pts) as BIGINT), 0.5) AS ScoreDiff50,
+	PERCENTILE(CAST(ABS(home_pts - vis_pts) as BIGINT), 0.75) AS ScoreDiff75,
+
+	
+FROM
+	nba_game_results
+
+GROUP BY 
+	year;

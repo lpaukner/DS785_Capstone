@@ -1,0 +1,24 @@
+SELECT 	
+	Year,
+	
+	--Total Score
+	ROUND(SUM((score_tm + score_opp))/COUNT(score_tm), 3) AS AvgTotalScore,
+	PERCENTILE(CAST((score_tm + score_opp) as BIGINT), 0.25) AS TotalScore25,
+	PERCENTILE(CAST((score_tm + score_opp) as BIGINT), 0.5) AS TotalScore50,
+	PERCENTILE(CAST((score_tm + score_opp) as BIGINT), 0.75) AS TotalScore75,
+
+	--Score Differential
+	ROUND(SUM(ABS(score_tm - score_opp))/COUNT(score_tm), 3) AS AvgScoreDiff,
+	PERCENTILE(CAST(ABS(score_tm - score_opp) as BIGINT), 0.25) AS ScoreDiff25,
+	PERCENTILE(CAST(ABS(score_tm - score_opp) as BIGINT), 0.5) AS ScoreDiff50,
+	PERCENTILE(CAST(ABS(score_tm - score_opp) as BIGINT), 0.75) AS ScoreDiff75,
+
+	--Counts
+
+	
+FROM
+	nfldb.season_results
+WHERE
+	Week >= 1 
+GROUP BY 
+	Year;

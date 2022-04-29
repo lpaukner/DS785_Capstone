@@ -1,0 +1,23 @@
+SELECT 	
+	Year,
+	
+	--Passing and Rushing attempts
+	ROUND(AVG(passing_att),3) AS pass_att_avg,
+	ROUND(AVG(rushing_att),3) AS rush_att_avg,
+	
+	--Passing to Rushing ratio
+	ROUND(AVG(passing_att)/AVG(rushing_att),3) AS ptr_ratio,
+	
+	--Average Drive info
+	ROUND(AVG(avgdrive_plays),3) AS drive_plays_avg,
+	ROUND(AVG(avgdrive_yds),3) AS drive_yds_avg,
+	ROUND(AVG(avgdrive_pts),3) AS drive_pts_avg,
+	ROUND(AVG(numdrives),3) AS numdrives_avg,
+	ROUND(AVG(scorepct),3) AS scorepct_avg
+	
+FROM
+	nfldb.team_stats_results
+WHERE
+	category == 'Team Stats' AND year > 1998
+GROUP BY 
+	Year;

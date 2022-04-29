@@ -1,0 +1,124 @@
+SELECT
+	Year,
+
+	--Num Batters
+	ROUND(AVG(numbat),3) AS NumBattersAvg,
+	MIN(numbat) AS Min_batters,
+	PERCENTILE(CAST((numbat) as BIGINT), 0.25) AS NumBatters25,
+	PERCENTILE(CAST((numbat) as BIGINT), 0.5) AS NumBatters50,
+	PERCENTILE(CAST((numbat) as BIGINT), 0.75) AS NumBatters75,
+	MAX(numbat) AS Max_batters,
+	
+	--Hits
+	ROUND(AVG(h),3) AS HitsAvg,
+	MIN(h) AS Min_Hits,
+	PERCENTILE(CAST((h) as BIGINT), 0.25) AS Hits25,
+	PERCENTILE(CAST((h) as BIGINT), 0.5) AS Hits50,
+	PERCENTILE(CAST((h) as BIGINT), 0.75) AS Hits75,
+	MAX(h) AS Max_Hits,
+
+	--BA
+	ROUND(AVG(ba),3) AS BA_avg,
+	MIN(ba) AS BA_min,
+	--PERCENTILE(ba, 0.25) AS BA25,
+	--PERCENTILE(ba, 0.5) AS BA50,
+	--PERCENTILE(ba, 0.75) AS BA75,
+	MAX(ba) AS BA_max,
+
+	--OBP
+	ROUND(AVG(obp),3) AS obp_avg,
+	MIN(obp) AS obp_min,
+	--PERCENTILE(ba, 0.25) AS BA25,
+	--PERCENTILE(ba, 0.5) AS BA50,
+	--PERCENTILE(ba, 0.75) AS BA75,
+	MAX(obp) AS obp_max,
+
+	--SLG
+	ROUND(AVG(slg),3) AS slg_avg,
+	MIN(slg) AS slg_min,
+	--PERCENTILE(ba, 0.25) AS BA25,
+	--PERCENTILE(ba, 0.5) AS BA50,
+	--PERCENTILE(ba, 0.75) AS BA75,
+	MAX(slg) AS slg_max,
+
+	--SB
+	ROUND(AVG(sb),3) AS SB_avg,
+	MIN(sb) AS SB_min,
+	PERCENTILE(CAST((sb) as BIGINT), 0.25) AS SB_25,
+	PERCENTILE(CAST((sb) as BIGINT), 0.5) AS SB_50,
+	PERCENTILE(CAST((sb) as BIGINT), 0.75) AS SB_75,
+	MAX(sb) AS SB_max,
+
+	--CS
+	ROUND(AVG(cs),3) AS cs_avg,
+	MIN(cs) AS cs_min,
+	PERCENTILE(CAST((cs) as BIGINT), 0.25) AS cs_25,
+	PERCENTILE(CAST((cs) as BIGINT), 0.5) AS cs_50,
+	PERCENTILE(CAST((cs) as BIGINT), 0.75) AS cs_75,
+	MAX(cs) AS cs_max,
+
+	--XBH
+	ROUND(AVG(doubles + triples + hr),3) AS XBH_avg,
+	MIN(doubles + triples + hr) AS XBH_min,
+	PERCENTILE(CAST((doubles + triples + hr) as BIGINT), 0.25) AS XBH_25,
+	PERCENTILE(CAST((doubles + triples + hr) as BIGINT), 0.5) AS XBH_50,
+	PERCENTILE(CAST((doubles + triples + hr) as BIGINT), 0.75) AS XBH_75,
+	MAX(doubles + triples + hr) AS XBH_max,
+
+	--TB
+	ROUND(AVG(tb),3) AS tb_avg,
+	MIN(tb) AS tb_min,
+	PERCENTILE(CAST((tb) as BIGINT), 0.25) AS tb_25,
+	PERCENTILE(CAST((tb) as BIGINT), 0.5) AS tb_50,
+	PERCENTILE(CAST((tb) as BIGINT), 0.75) AS tb_75,
+	MAX(tb) AS tb_max,
+
+	--HRs
+	ROUND(AVG(hr),3) AS hr_avg,
+	MIN(hr) AS hr_min,
+	PERCENTILE(CAST((hr) as BIGINT), 0.25) AS hr_25,
+	PERCENTILE(CAST((hr) as BIGINT), 0.5) AS hr_50,
+	PERCENTILE(CAST((hr) as BIGINT), 0.75) AS hr_75,
+	MAX(hr) AS hr_max,
+
+	--SO
+	ROUND(AVG(so),3) AS so_avg,
+	MIN(so) AS so_min,
+	PERCENTILE(CAST((so) as BIGINT), 0.25) AS so_25,
+	PERCENTILE(CAST((so) as BIGINT), 0.5) AS so_50,
+	PERCENTILE(CAST((so) as BIGINT), 0.75) AS so_75,
+	MAX(so) AS so_max,
+
+	--BB
+	ROUND(AVG(bb),3) AS bb_avg,
+	MIN(bb) AS bb_min,
+	PERCENTILE(CAST((bb) as BIGINT), 0.25) AS bb_25,
+	PERCENTILE(CAST((bb) as BIGINT), 0.5) AS bb_50,
+	PERCENTILE(CAST((bb) as BIGINT), 0.75) AS bb_75,
+	MAX(bb) AS bb_max,
+
+	--GDP
+	ROUND(AVG(gdp),3) AS gdp_avg,
+	MIN(gdp) AS gdp_min,
+	PERCENTILE(CAST((gdp) as BIGINT), 0.25) AS gdp_25,
+	PERCENTILE(CAST((gdp) as BIGINT), 0.5) AS gdp_50,
+	PERCENTILE(CAST((gdp) as BIGINT), 0.75) AS gdp_75,
+	MAX(gdp) AS gdp_max,
+
+	--LOB
+	ROUND(AVG(lob),3) AS lob_avg,
+	MIN(lob) AS lob_min,
+	PERCENTILE(CAST((lob) as BIGINT), 0.25) AS lob_25,
+	PERCENTILE(CAST((lob) as BIGINT), 0.5) AS lob_50,
+	PERCENTILE(CAST((lob) as BIGINT), 0.75) AS lob_75,
+	MAX(lob) AS lob_max
+
+FROM
+	default.mlb_batting_results_upd
+
+WHERE
+	--exclude average and total rows
+	tm <> ('League Average') AND tm <> ""
+
+GROUP BY 
+	Year;

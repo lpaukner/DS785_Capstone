@@ -1,0 +1,20 @@
+SELECT 	
+	Year,
+	
+	--4th down Conversion attempts
+	ROUND(AVG(downs_4datt),3) AS fda_avg,
+	ROUND(MIN(downs_4datt),3) AS fda_min,
+	ROUND(MAX(downs_4datt),3) AS fda_max,
+
+	--Conversion attempt success
+	ROUND(SUM(downs_4dconv),3) AS fdc_avg,
+	ROUND(MIN(downs_4dconv),3) AS fdc_min,
+	ROUND(MAX(downs_4dconv),3) AS fdc_max
+
+	
+FROM
+	nfldb.conversion_results
+WHERE
+	category == 'Team Stats'
+GROUP BY 
+	Year;

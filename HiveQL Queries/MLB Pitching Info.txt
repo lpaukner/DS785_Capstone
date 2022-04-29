@@ -1,0 +1,55 @@
+SELECT
+	Year,
+
+	--Num Pitchers
+	ROUND(AVG(totalpitchers),3) AS Avg_pitchers,
+	MIN(totalpitchers) AS Min_pitchers,
+	PERCENTILE(CAST((totalpitchers) as BIGINT), 0.25) AS Totalpitchers25,
+	PERCENTILE(CAST((totalpitchers) as BIGINT), 0.5) AS Totalpitchers50,
+	PERCENTILE(CAST((totalpitchers) as BIGINT), 0.75) AS Totalpitchers75,
+	MAX(totalpitchers) AS Max_pitchers,
+	
+	--ERA
+	ROUND(AVG(era),3) AS Avg_era,
+	MIN(era) AS Min_era,
+	MAX(era) AS Max_era,
+
+	--WHIP
+	ROUND(AVG(whip),3) AS Avg_whip,
+	MIN(whip) AS Min_whip,
+	MAX(whip) AS Max_whip,
+
+	--ibb
+	ROUND(AVG(ibb),3) AS Avg_ibb,
+	MIN(ibb) AS Min_ibb,
+	PERCENTILE(CAST((ibb) as BIGINT), 0.25) AS ibb_25,
+	PERCENTILE(CAST((ibb) as BIGINT), 0.5) AS ibb_50,
+	PERCENTILE(CAST((ibb) as BIGINT), 0.75) AS ibb_75,
+	MAX(ibb) AS Max_ibb,
+
+	--R
+	ROUND(AVG(r),3) AS Avg_r,
+	MIN(r) AS Min_r,
+	PERCENTILE(CAST((r) as BIGINT), 0.25) AS r_25,
+	PERCENTILE(CAST((r) as BIGINT), 0.5) AS r_50,
+	PERCENTILE(CAST((r) as BIGINT), 0.75) AS r_75,
+	MAX(r) AS Max_r,
+
+	--ER
+	ROUND(AVG(er),3) AS Avg_er,
+	MIN(er) AS Min_er,
+	PERCENTILE(CAST((er) as BIGINT), 0.25) AS er_25,
+	PERCENTILE(CAST((er) as BIGINT), 0.5) AS er_50,
+	PERCENTILE(CAST((er) as BIGINT), 0.75) AS er_75,
+	MAX(er) AS Max_er,
+
+
+FROM
+	mlbdb.pitching_results
+
+WHERE
+	--exclude average and total rows
+	rownum < 30
+
+GROUP BY 
+	Year;

@@ -1,0 +1,19 @@
+SELECT 	
+	year,
+	
+	--Attempt stats
+	ROUND(AVG(two_point_attempt), 3) AS two_point_attempt_Avg,
+	ROUND(AVG(three_point_attempt), 3) AS three_point_attempt_Avg,
+	ROUND(AVG(fta), 3) AS fta_Avg,
+
+	--Percent made stats
+	ROUND(AVG(two_point_pct), 3) AS two_point_pct_pct_Avg,
+	ROUND(AVG(three_point_pct), 3) AS three_point_pct_Avg,
+	ROUND(AVG(ft_pct), 3) AS ft_pct_Avg
+
+	
+FROM
+	nba_team_per_game
+
+GROUP BY 
+	year;
